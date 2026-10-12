@@ -313,18 +313,3 @@ Check logs for key messages:
 ✅ Trade marked as SETTLED: tradeId=...
 ✅ Settlement marked as SETTLED: settlementId=...
 ```
-
-## Future Enhancements
-
-- [ ] Settlement date validation (T+2 processing)
-- [ ] Bank nostro account integration
-- [ ] Manual approval workflow for large settlements (> $5000)
-- [ ] Settlement event publishing (settlement.settled events)
-- [ ] Metrics and monitoring (Prometheus)
-- [ ] Distributed tracing (OpenTelemetry)
-- [ ] Dead letter queue handling
-- [ ] Multi-region deployment
-
-## License
-
-Proprietary - Atomic FX Trading System
