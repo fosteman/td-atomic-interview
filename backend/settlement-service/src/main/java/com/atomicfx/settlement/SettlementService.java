@@ -97,12 +97,16 @@ public class SettlementService {
 
     /**
      * Publish settlement.instructed event and mark settlement as SETTLED.
+     * Includes 5 second delay before settlement is finalized.
      */
     @Transactional
     private void publishSettlementInstructed(Settlement settlement) {
         log.info("Publishing settlement.instructed: settlementId={}", settlement.getSettlementId());
 
         try {
+            log.info("⏳ Waiting 5 seconds before settlement finalization...");
+            Thread.sleep(5000);
+
             settlement.setStatus(Settlement.SettlementStatus.SETTLED);
             settlement.setSettledAt(Instant.now());
             settlementRepository.save(settlement);
