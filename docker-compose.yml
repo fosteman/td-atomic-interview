@@ -26,8 +26,8 @@ services:
       username_admin_password: admin
     ports:
       - "8008:8008"      # Web UI
-      - "55555:55555"     # SMF
-      - "8080:8080"       # REST API
+      - "55554:55555"     # SMF
+      - "12387:8080"       # REST API
       - "1883:1883"       # MQTT
       - "8883:8883"       # AMQP
     healthcheck:

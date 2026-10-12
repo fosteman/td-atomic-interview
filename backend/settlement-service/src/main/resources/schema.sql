@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS settlements (
     settled_at TIMESTAMP
 );
 
-CREATE INDEX idx_trade_id ON settlements(trade_id);
-CREATE INDEX idx_status ON settlements(status);
+CREATE INDEX IF NOT EXISTS idx_trade_id ON settlements(trade_id);
+CREATE INDEX IF NOT EXISTS idx_status ON settlements(status);

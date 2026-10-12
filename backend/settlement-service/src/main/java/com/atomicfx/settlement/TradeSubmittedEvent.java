@@ -1,5 +1,6 @@
 package com.atomicfx.settlement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -7,6 +8,7 @@ import java.time.Instant;
 /**
  * Event received from Solace: trading.fx.trade.submitted
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record TradeSubmittedEvent(
     @JsonProperty("tradeId") String tradeId,
     @JsonProperty("accountId") String accountId,

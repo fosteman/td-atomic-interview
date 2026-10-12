@@ -116,6 +116,13 @@ public class SettlementService {
     }
 
     /**
+     * Get all settlements
+     */
+    public java.util.List<Settlement> getAllSettlements() {
+        return settlementRepository.findAll();
+    }
+
+    /**
      * Mark settlement as instructed (sent to bank)
      */
     @Transactional
@@ -156,5 +163,57 @@ public class SettlementService {
 
     private void publishSettlementSettled(Settlement settlement) {
         log.info("Publishing settlement.settled: settlementId={}", settlement.getSettlementId());
+    }
+
+    /**
+     * Auto-settle ready settlements based on amount.
+     * - Amount > 5000: Error (requires manual approval)
+     * - Amount <= 5000: Auto-settle
+     */
+    @Transactional
+    public void settleReadySettlements() {
+        log.debug("Processing ready settlements...");
+
+        // Get all INSTRUCTED settlements
+        var readySettlements = settlementRepository.findByStatus(Settlement.SettlementStatus.INSTRUCTED);
+
+        if (readySettlements.isEmpty()) {
+            return;
+        }
+
+        log.info("Found {} settlements to process", readySettlements.size());
+
+        for (Settlement settlement : readySettlements) {
+            try {
+                settleIfEligible(settlement);
+            } catch (Exception e) {
+                log.error("Failed to process settlement {}: {}", settlement.getSettlementId(), e.getMessage());
+                // Continue to next settlement, don't block all processing
+            }
+        }
+    }
+
+    /**
+     * Settle a settlement if it meets the criteria.
+     * - If amount > 5000: throw error
+     * - If amount <= 5000: mark as SETTLED
+     */
+    private void settleIfEligible(Settlement settlement) {
+        BigDecimal amount = settlement.getSettlementAmount();
+        BigDecimal threshold = new BigDecimal("5000");
+
+        log.info("Evaluating settlement {}: amount={}", settlement.getSettlementId(), amount);
+
+        if (amount.compareTo(threshold) > 0) {
+            String error = "Settlement amount " + amount + " exceeds threshold " + threshold + " - requires manual approval";
+            log.warn("Settlement {} rejected: {}", settlement.getSettlementId(), error);
+            throw new IllegalStateException(error);
+        }
+
+        // Amount <= 5000: auto-settle
+        log.info("Settlement {} eligible for auto-settle (amount={} <= threshold={})",
+            settlement.getSettlementId(), amount, threshold);
+
+        markSettled(settlement.getSettlementId());
     }
 }

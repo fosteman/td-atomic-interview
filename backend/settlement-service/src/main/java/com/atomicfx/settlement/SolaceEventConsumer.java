@@ -41,21 +41,8 @@ public class SolaceEventConsumer {
         this.solaceListener = solaceListener;
     }
 
-    /**
-     * Poll Solace for trade.submitted events every 2 seconds.
-     * This is a simplified polling mechanism. In production, use JMS subscriber.
-     */
-    @Scheduled(fixedDelay = 2000, initialDelay = 3000)
-    public void pollTradeSubmittedEvents() {
-        try {
-            log.debug("Polling Solace for trade.submitted events...");
-            // In production: use Solace REST Messaging API to consume from topic
-            // For now, we log readiness to consume
-            // The actual consumption would use Solace's event queue API
-        } catch (Exception e) {
-            log.error("Error polling Solace", e);
-        }
-    }
+    // Disabled - using native JMS in SolaceListener instead
+    // Kept for backward webhook compatibility only
 
     /**
      * Webhook endpoint for receiving trade events from Order API.

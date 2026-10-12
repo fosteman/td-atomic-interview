@@ -44,7 +44,7 @@ public class SettlementController {
 
     /**
      * POST /api/settlements/{settlementId}/settle
-     * Mark settlement as complete
+     * Manually mark settlement as complete (for testing/admin)
      */
     @PostMapping("/{settlementId}/settle")
     public ResponseEntity<SettlementResponse> settle(@PathVariable String settlementId) {
@@ -55,5 +55,18 @@ public class SettlementController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    /**
+     * GET /api/settlements/
+     * Get all settlements (for admin/monitoring)
+     */
+    @GetMapping
+    public ResponseEntity<java.util.List<SettlementResponse>> getAllSettlements() {
+        java.util.List<SettlementResponse> settlements = settlementService.getAllSettlements()
+            .stream()
+            .map(SettlementResponse::from)
+            .toList();
+        return ResponseEntity.ok().body(settlements);
     }
 }
