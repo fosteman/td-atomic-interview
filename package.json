@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "frontend": "cd frontend; vite",
     "posgres": "docker run -d --name postgres \\\n  -e POSTGRES_PASSWORD=password \\\n  -p 5432:5432 \\\n  postgres:15",
     "solace": "docker run -d \\\n  -p 8080:8080 \\\n  -p 55554:55555 \\\n  -p 8008:8008 \\\n  -p 1883:1883 \\\n  -p 8000:8000 \\\n  -p 5672:5672 \\\n  -p 9000:9000 \\\n  -p 2222:2222 \\\n  --shm-size=1g \\\n  --env username_admin_globalaccesslevel=admin \\\n  --env username_admin_password=admin \\\n  --name=solace \\\n  solace/solace-pubsub-standard\n",
     "test": "echo \"Error: no test specified\" && exit 1"
