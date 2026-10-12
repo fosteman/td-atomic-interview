@@ -42,7 +42,7 @@ public class SettlementService {
      * Create a settlement record for the trade.
      */
     @Transactional
-    public void processTradeSubmitted(TradeSubmittedEvent event) {
+    public void processTradeSubmitted(TradeSubmittedEvent event) throws InterruptedException {
         log.info("Processing trade submission: tradeId={}", event.tradeId());
 
         // Check if settlement already exists (idempotency)
@@ -66,7 +66,11 @@ public class SettlementService {
         );
 
         // Route to nostro account (simplified: based on currency)
+        // spot vostro / nostro
         settlement.setNostroAccount(routeToNostro(event.pair(), event.side()));
+
+// b logic.
+// todo: preceded risk assessment.
 
         Settlement savedSettlement = settlementRepository.save(settlement);
         log.info("Settlement created: settlementId={} status=PENDING", savedSettlement.getSettlementId());
@@ -100,7 +104,7 @@ public class SettlementService {
      * Includes 5 second delay before settlement is finalized.
      */
     @Transactional
-    private void publishSettlementInstructed(Settlement settlement) {
+    private void publishSettlementInstructed(Settlement settlement) throws InterruptedException {
         log.info("Publishing settlement.instructed: settlementId={}", settlement.getSettlementId());
 
         try {
@@ -120,7 +124,7 @@ public class SettlementService {
             } else {
                 log.warn("⚠️  Trade not found: tradeId={}", settlement.getTradeId());
             }
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             log.error("❌ Error in publishSettlementInstructed: {}", e.getMessage(), e);
             throw e;
         }
