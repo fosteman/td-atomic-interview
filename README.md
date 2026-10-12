@@ -1,6 +1,8 @@
 # Atomic FX - Settlement System
 
-A distributed FX (foreign exchange) trading and settlement system built with Spring Boot 3.x, PostgreSQL, and Solace JMS messaging.
+in lieu of my interview with td team, let me do some prep work and understand the tech stack. 
+
+so i built a distributed FX (foreign exchange) trading and settlement system built with Spring Boot 3.x, PostgreSQL, and Solace JMS messaging. not without use of Ai, indeed, a great learning tool. 
 
 ## Architecture Overview
 
