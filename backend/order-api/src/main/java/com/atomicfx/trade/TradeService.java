@@ -37,6 +37,9 @@ public class TradeService {
      * The outbox event will be published to Solace by a separate scheduled publisher.
      * This ensures durability: if the API crashes after returning 200, the event is
      * still safely in the database and will be published on recovery.
+
+     // scale with replica / load balancing.
+     //
      */
     @Transactional
     public TradeResponse submitTrade(String accountId, SubmitTradeRequest request) {
@@ -70,6 +73,8 @@ public class TradeService {
         Trade savedTrade = tradeRepository.save(trade);
         log.info("Trade created: {} status=SUBMITTED", savedTrade.getTradeId());
 
+ // crashes;
+
         // Step 5: Create and save the outbox event IN THE SAME TRANSACTION
         OutboxEvent outboxEvent = new OutboxEvent(
             savedTrade.getTradeId(),
@@ -78,10 +83,10 @@ public class TradeService {
         );
         outboxRepository.save(outboxEvent);
         log.info("Outbox event created: {}", outboxEvent.getEventId());
-
+ // ACID - atomic consistent idemptotent and durable.
         // Transaction commits here. If it succeeds, both trade AND event are persisted.
         // If it fails, BOTH are rolled back. Neither happens partially.
-        return TradeResponse.from(savedTrade);
+        return TradeResponse.from(savedTrade); // 201 created
     }
 
     /**
