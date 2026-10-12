@@ -28,10 +28,12 @@ import java.time.format.DateTimeFormatter;
 public class SettlementService {
     private static final Logger log = LoggerFactory.getLogger(SettlementService.class);
     private final SettlementRepository settlementRepository;
+    private final TradeRepository tradeRepository;
     private final RestTemplate restTemplate;
 
-    public SettlementService(SettlementRepository settlementRepository, RestTemplate restTemplate) {
+    public SettlementService(SettlementRepository settlementRepository, TradeRepository tradeRepository, RestTemplate restTemplate) {
         this.settlementRepository = settlementRepository;
+        this.tradeRepository = tradeRepository;
         this.restTemplate = restTemplate;
     }
 
@@ -94,17 +96,30 @@ public class SettlementService {
     }
 
     /**
-     * Publish settlement.instructed event.
-     * In production, this would use the outbox pattern (insert to DB, async publisher).
-     * For now, we mock it.
+     * Publish settlement.instructed event and mark settlement as SETTLED.
      */
+    @Transactional
     private void publishSettlementInstructed(Settlement settlement) {
         log.info("Publishing settlement.instructed: settlementId={}", settlement.getSettlementId());
-        // In a real system:
-        // 1. Insert OutboxEvent into database (same transaction as settlement save)
-        // 2. Separate publisher polls and publishes to Solace
-        //
-        // For now, just log that it would be published.
+
+        try {
+            settlement.setStatus(Settlement.SettlementStatus.SETTLED);
+            settlement.setSettledAt(Instant.now());
+            settlementRepository.save(settlement);
+            log.info("Settlement marked as SETTLED: settlementId={}", settlement.getSettlementId());
+
+            Trade trade = tradeRepository.findByTradeId(settlement.getTradeId()).orElse(null);
+            if (trade != null) {
+                trade.setStatus(Trade.TradeStatus.SETTLED);
+                tradeRepository.save(trade);
+                log.info("✅ Trade marked as SETTLED: tradeId={}", settlement.getTradeId());
+            } else {
+                log.warn("⚠️  Trade not found: tradeId={}", settlement.getTradeId());
+            }
+        } catch (Exception e) {
+            log.error("❌ Error in publishSettlementInstructed: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**
