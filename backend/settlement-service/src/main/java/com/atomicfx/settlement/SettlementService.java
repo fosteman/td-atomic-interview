@@ -109,6 +109,7 @@ public class SettlementService {
 
         try {
             log.info("⏳ Waiting 5 seconds before settlement finalization...");
+            // todo:
             Thread.sleep(5000);
 
             settlement.setStatus(Settlement.SettlementStatus.SETTLED);
