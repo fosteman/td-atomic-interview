@@ -1,4 +1,4 @@
-# Atomic FX - Settlement System
+# AN FX - Settlement System
 
 in lieu of my interview with td team, let me do some prep work and understand the tech stack. 
 
@@ -46,10 +46,10 @@ so i built a distributed FX (foreign exchange) trading and settlement system bui
 
 ## Database Setup
 
-PostgreSQL must be running with database `atomicfx` and user `postgres:password`.
+PostgreSQL must be running with database `fx` and user `postgres:password`.
 
 ```bash
-createdb atomicfx
+createdb fx
 ```
 
 Database tables are auto-created by Hibernate on first run (see `application.yml` configs).
@@ -122,7 +122,7 @@ mvn spring-boot:run
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/atomicfx
+    url: jdbc:postgresql://localhost:5432/fx
     username: postgres
     password: password
   jpa:
@@ -136,7 +136,7 @@ server:
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/atomicfx
+    url: jdbc:postgresql://localhost:5432/fx
     username: postgres
     password: password
   jpa:
@@ -264,7 +264,7 @@ cd backend/settlement-service && mvn spring-boot:run &
 
 ### Clearing Data
 ```bash
-PGPASSWORD=password psql -U postgres -d atomicfx -h localhost << EOF
+PGPASSWORD=password psql -U postgres -d fx -h localhost << EOF
 DELETE FROM settlements;
 DELETE FROM trades;
 DELETE FROM outbox_events;
